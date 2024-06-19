@@ -1,0 +1,27 @@
+; ELWBDS.MDF
+
+Module Name: BattleDroids
+
+Developer: Elwynor Technologies
+
+Requires:
+Replaces:
+
+Install:
+
+Online user manual: ELWBDS.DOC
+
+DLLs: ELWBDS
+MSGs: ELWBDS
+
+Btrieve page size: 512
+Btrieve files:     1
+
+Cleanup:
+
+Event-1:
+Event-2:
+Event-3:
+Event-4:
+
+Add-On Utility:

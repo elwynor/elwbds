@@ -1,0 +1,6 @@
+; Filename: ELWBDS_EXP.DEF
+LIBRARY ELWBDS.DLL
+; *** Visual Studio 2022 EXPORT ALIASES ONLY ***
+; BattleDroids - Copyright (c) 2024 Elwynor Technologies, LLC
+EXPORTS
+	_init__elwbds=init__elwbds	@1
