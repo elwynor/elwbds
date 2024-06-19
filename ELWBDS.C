@@ -724,7 +724,7 @@ genbrg(INT brg, INT usr)
   if ((brg < 1) || (brg > 23) ||
       ((brg > 23) && (!sameas(usaptr->userid, "Sysop")))) rb = (bdrand(1, 9));
   else if (brg > NUM_BBRG - 1) rb = bdrand(1, 9); else rb = brg; // RH 6/19/2024 to eliminate C6385 Reading invalid data 
-  bdbpt->weapon=bdrand(bbrg[rb].lowep,bbrg[rb].hiwep);
+  bdbpt->weapon=(CHAR)bdrand(bbrg[rb].lowep,bbrg[rb].hiwep);
   updbchs(bdrand(bbrg[rb].lochs,bbrg[rb].hichs));
   strcpy(bdbar[b].name,bbrg[rb].name);
   c=btpcnt(bbrg[rb].name);
@@ -762,15 +762,15 @@ genbrg(INT brg, INT usr)
 VOID
 updbchs(INT chs)
 {
-  bdbpt->chs= chs;
-  bdbpt->pwr= bchs[chs].pwr;
-  bdbpt->cmp= bchs[chs].cmp;
-  bdbpt->stb= bchs[chs].stb;
-  bdbpt->man= bchs[chs].man;
-  bdbpt->str= bchs[chs].str;
-  bdbpt->spd= bchs[chs].spd;
-  bdbpt->agl= bchs[chs].agl;
-  bdbpt->trg= bchs[chs].trg;
+  bdbpt->chs= (CHAR)chs;
+  bdbpt->pwr= (CHAR)bchs[chs].pwr;
+  bdbpt->cmp= (CHAR)bchs[chs].cmp;
+  bdbpt->stb= (CHAR)bchs[chs].stb;
+  bdbpt->man= (CHAR)bchs[chs].man;
+  bdbpt->str= (CHAR)bchs[chs].str;
+  bdbpt->spd= (CHAR)bchs[chs].spd;
+  bdbpt->agl= (CHAR)bchs[chs].agl;
+  bdbpt->trg= (CHAR)bchs[chs].trg;
   bdbpt->enr= bdbpt->pwr*5;
   bdbpt->ar=  bchs[chs].armor;
   bdbpt->mar= bchs[chs].armor;
@@ -1069,7 +1069,7 @@ GBOOL crsbd(VOID)
 
   setbd();
   if (usrptr->flags&INJOIP) return(1);
-  sel=tolower(margv[0][0]);
+  sel=(CHAR)tolower(margv[0][0]);
   switch(newstt=usrptr->substt) {
   case 0:
     prfmlt(newstt=BDM);
@@ -1129,6 +1129,8 @@ INT
 bdinp(VOID)
 {
   INT m1,m3,m4,un;
+
+  m1 = m3 = m4 = 0; // avoid c4701
 
   setbd();
   if (margc > 1) m1=atoi(margv[1]);
@@ -1663,15 +1665,15 @@ gendrd(VOID)
 VOID
 updchs(INT chs)
 {
-  bdptr->chs= chs;
-  bdptr->pwr= bchs[chs].pwr;
-  bdptr->cmp= bchs[chs].cmp;
-  bdptr->stb= bchs[chs].stb;
-  bdptr->man= bchs[chs].man;
-  bdptr->str= bchs[chs].str;
-  bdptr->spd= bchs[chs].spd;
-  bdptr->agl= bchs[chs].agl;
-  bdptr->trg= bchs[chs].trg;
+  bdptr->chs= (CHAR)chs;
+  bdptr->pwr= (CHAR)bchs[chs].pwr;
+  bdptr->cmp= (CHAR)bchs[chs].cmp;
+  bdptr->stb= (CHAR)bchs[chs].stb;
+  bdptr->man= (CHAR)bchs[chs].man;
+  bdptr->str= (CHAR)bchs[chs].str;
+  bdptr->spd= (CHAR)bchs[chs].spd;
+  bdptr->agl= (CHAR)bchs[chs].agl;
+  bdptr->trg= (CHAR)bchs[chs].trg;
   bdptr->enr= bdptr->pwr*5;
   bdptr->ar=  bchs[chs].armor;
   bdptr->mar= bchs[chs].armor;
@@ -1754,7 +1756,7 @@ locdrd(CHAR *uid)
 INT
 locbrg(CHAR *bid)
 {
-  INT cnt,j,b;
+  INT cnt,j,b=1;
 
   for (j=0,cnt=0; j<NBORGS; j++) {
     if ((bdbar[j].active != 0) && (sameto(bid,bdbar[j].name))) {
@@ -2217,8 +2219,10 @@ dmgdrd(INT usr, INT brg, INT who, INT damg, INT itnm, CHAR *dir, INT pmt, INT us
   bdtp=&bdarr[who];
   bdtp->ar-=damg;
   bdtp->cbtdly=30;
-  if (dir != "-") {
-    if (dir == "+") prfmlt(BDDMG1,bobj[w].desc,damg);
+  //if (dir != "-") {
+  if (strcmp(dir, "-") != 0) {  // avoid C4130 warning
+    //if (dir == "+") prfmlt(BDDMG1,bobj[w].desc,damg);
+    if (strcmp(dir, "+") == 0) prfmlt(BDDMG1, bobj[w].desc, damg); // avoid C4130 warning
     else            prfmlt(BDDMG2,bobj[w].desc,dirbds[bdgdir(dir)],damg);
     if (bdtp->ar >= 0) {
       bdpmt();
@@ -2642,7 +2646,7 @@ INT
 attack(CHAR *who)
 {
   BDARR *bdtp;
-  INT i,a,b,n,othd,dmg;
+  INT i,a,b,n,othd=-2,dmg;
 
   setbd();
   n=0;
@@ -2881,8 +2885,8 @@ bdbuy(VOID)
           prfmlt(NOMINE);
           outmlt(usrnum);
       } else {
-          if (num<IRK1) bdptr->weapon=num;
-          else bdptr->inv[where]=num;
+          if (num<IRK1) bdptr->weapon=(CHAR)num;
+          else bdptr->inv[where]=(CHAR)num;
           if (num < NUM_BOBJ - 1) {
               bdptr->credits -= bobj[num].price; // RH 6/19/2024 aboid C6385 warning.
               prfmlt(YOUBUY, bobj[num].name, ltoa(bobj[num].price));
