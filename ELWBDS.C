@@ -695,7 +695,8 @@ INT
 genbrg(INT brg, INT usr)
 {
   INT j,k,b,c,rb;
-  CHAR *brgnum="",*dash="-",*zero1="0",*zero2="00";
+  CHAR brgnum[12]; // sufficient to hold the largest possible integer - RH to elim V10 crash
+  CHAR *dash="-",*zero1="0",*zero2="00"; // *brgnum="" RH eliminate V10 crash
 
   setbd();
   b=-1;
@@ -727,12 +728,12 @@ genbrg(INT brg, INT usr)
   bdbpt->weapon=(CHAR)bdrand(bbrg[rb].lowep,bbrg[rb].hiwep);
   updbchs(bdrand(bbrg[rb].lochs,bbrg[rb].hichs));
   strcpy(bdbar[b].name,bbrg[rb].name);
-  c=btpcnt(bbrg[rb].name);
-  strcat(bdbar[b].name,dash);
-  if (c < 10) strcat(bdbar[b].name,zero2);
-  else if (c < 100) strcat(bdbar[b].name,zero1);
-  itoa(c,brgnum,10);
-  strcat(bdbar[b].name,brgnum);
+  c = btpcnt(bbrg[rb].name);
+  strcat(bdbar[b].name, dash);
+  if (c < 10) strcat(bdbar[b].name, zero2);
+  else if (c < 100) strcat(bdbar[b].name, zero1);
+  itoa(c, brgnum, 10);
+  strcat(bdbar[b].name, brgnum);
   for (k=0; k<NBORGS; k++)
     if ((sameas(bdbar[b].name,bdbar[k].name)) &&
 	(b != k) && (bdbar[k].active == 1)) return(0);
